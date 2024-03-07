@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .avatar {
+            width: 50px; /* Ancho de las imágenes */
+            height: 50px; /* Altura de las imágenes */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Barra de navegación -->
+    <div id="navbar-container"></div>
+    <script>
+        // Cargar la barra de navegación desde el archivo navbar.html
+        fetch('navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar-container').innerHTML = data;
+            });
+        
+        // Función para cargar los avatares de los usuarios restringidos
+        async function cargarAvataresUsuariosRestringidos() {
+            try {
+                const response = await fetch('http://localhost:3000/usuariosrestringidos');
+                if (!response.ok) {
+                    throw new Error('Error al obtener los usuarios restringidos.');
+                }
+                const usuariosRestringidos = await response.json();
+                const container = document.querySelector('#avatares-container');
+
+                usuariosRestringidos.forEach(usuario => {
+                    const div = document.createElement('div');
+                    div.innerHTML = `
+                        <img src="http://localhost:3000/avatares/${usuario.avatar}" alt="${usuario.nombre}" class="avatar mr-2">
+                        <span>${usuario.nombre}</span>
+                        <a href="gestion_usuarios.html">Gestión de Usuarios</a> <!-- Enlace a la gestión de usuarios -->
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Error al cargar los avatares de los usuarios restringidos:', error);
+            }
+        }
+
+        // Llamar a la función para cargar los avatares de los usuarios restringidos cuando la página se cargue
+        document.addEventListener('DOMContentLoaded', cargarAvataresUsuariosRestringidos);
+    </script>
+
+    <div class="container mt-5">
+        <h1 class="mb-4">¡Bienvenido a tu pantalla de inicio!</h1>
+        <p>¡Has iniciado sesión con éxito!</p>
+
+        <!-- Visualización de avatares y enlace a la administración -->
+        <div class="mt-4">
+            <h2>Avatares de Usuarios Restringidos</h2>
+            <div id="avatares-container"></div>
+        </div>
+    </div>
+
+    <script>
+        function cerrarSesion() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+</body>
+
+</html>

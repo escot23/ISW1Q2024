@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Usuarios Restringidos</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Agrega tus estilos personalizados aquí si es necesario */
+        .avatar {
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+        }
+        .avatar:hover {
+            border: 2px solid blue; /* Cambia el borde cuando se pasa el ratón sobre el avatar */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+
+            <!-- Barra de navegación -->
+        <div id="navbar-container"></div>
+        <script>
+            // Cargar la barra de navegación desde el archivo navbar.html
+            fetch('navbar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('navbar-container').innerHTML = data;
+                });
+        </script>
+        <h1 class="mb-4">Registro de Usuarios Restringidos</h1>
+
+        <!-- Formulario de registro de usuario restringido -->
+        <form id="formulario-nuevo-usuario" class="needs-validation" novalidate>
+            <div class="form-group">
+                <label for="nombre">Nombre:</label>
+                <input type="text" class="form-control" id="nombre" required>
+                <div class="invalid-feedback">
+                    Por favor ingresa un nombre válido.
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="pin">PIN:</label>
+                <input type="text" class="form-control" id="pin" required pattern="[0-9]{6}">
+                <div class="invalid-feedback">
+                    Por favor ingresa un PIN válido (6 dígitos numéricos).
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="avatar">Avatar:</label>
+                <div id="avatares-container" class="d-flex flex-wrap"></div>
+                <input type="hidden" id="avatar" required>
+                <div class="invalid-feedback">
+                    Por favor selecciona un avatar.
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="edad">Edad:</label>
+                <input type="number" class="form-control" id="edad" required>
+                <div class="invalid-feedback">
+                    Por favor ingresa una edad válida.
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="saveUser()">Agregar Usuario</button>
+        </form>
+    </div>
+    <script>
+        // Función para obtener los nombres de archivo de avatares desde el backend
+        async function obtenerNombresDeArchivosDeAvatares() {
+            try {
+                const response = await fetch('http://localhost:3000/api/avatares');
+                console.log(response); 
+                if (!response.ok) {
+                    throw new Error('Error al obtener los nombres de archivo de avatares.');
+                }
+                return await response.json();
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        // Función para cargar los avatares en el contenedor
+        document.addEventListener('DOMContentLoaded', async function () {
+            const avataresContainer = document.getElementById('avatares-container');
+
+            try {
+                // Obtener la lista de nombres de archivo de avatares desde el backend
+                const nombresDeArchivos = await obtenerNombresDeArchivosDeAvatares();
+
+                // Mostrar las imágenes de avatares en el contenedor
+                nombresDeArchivos.forEach(nombreArchivo => {
+                    const img = document.createElement('img');
+                    img.src = `http://localhost:3000/avatares/${nombreArchivo}`; 
+                    img.alt = nombreArchivo;
+                    img.classList.add('avatar');
+                    img.addEventListener('click', () => {
+                        document.getElementById('avatar').value = nombreArchivo;
+                        // Quita la clase 'border-primary' de todos los avatares
+                        document.querySelectorAll('.avatar').forEach(avatar => {
+                            avatar.classList.remove('border-primary');
+                        });
+                        // Agrega la clase 'border-primary' al avatar seleccionado
+                        img.classList.add('border-primary');
+                    });
+                    avataresContainer.appendChild(img);
+                });
+            } catch (error) {
+                console.error('Error al obtener los nombres de archivo de avatares:', error);
+            }
+        });
+
+        // Agrega validación personalizada al formulario
+        const form = document.getElementById('formulario-nuevo-usuario');
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            if (!form.checkValidity()) {
+                event.stopPropagation();
+            } else {
+                await saveUser();
+            }
+            form.classList.add('was-validated');
+        });
+        
+        function saveUser() {
+            const ajaxRequest = new XMLHttpRequest();
+            ajaxRequest.addEventListener("load", function () {
+                if (ajaxRequest.status >= 200 && ajaxRequest.status < 300) {
+                    alert("Usuario RESTRINGIDO registrado correctamente");
+                    window.location.href = "perfil.html";
+                } else {
+                    console.error('Error en la solicitud:', ajaxRequest.responseText);
+                    alert("Hubo un error al intentar registrar el usuario");
+                }
+            });
+            ajaxRequest.addEventListener("error", function () {
+                console.error('Error en la solicitud:', ajaxRequest.responseText);
+                alert("Hubo un error al intentar registrar el usuario");
+            });
+            ajaxRequest.open("POST", "http://localhost:3000/usuariosrestringido");
+            ajaxRequest.setRequestHeader("Content-Type", "application/json");
+
+            const data = {
+                nombre: document.getElementById("nombre").value,
+                pin: document.getElementById("pin").value,
+                avatar: document.getElementById("avatar").value,
+                edad: document.getElementById("edad").value
+            };
+
+            ajaxRequest.send(JSON.stringify(data));
+        }
+    </script>
+</body>
+</html>
