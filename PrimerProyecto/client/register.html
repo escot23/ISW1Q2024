@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Usuario</title>
+</head>
+<body>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h1 class="card-title text-center">Registro de Usuario</h1>
+              <div class="form-group">
+                <label for="email">Correo electrónico:</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+              </div>
+              <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+              </div>
+              <div class="form-group">
+                <label for="repeat-password">Repetir Contraseña:</label>
+                <input type="password" class="form-control" id="repeat-password" name="repeat-password" required>
+              </div>
+              <div class="form-group">
+                <label for="pin">Pin (6 dígitos):</label>
+                <input type="number" class="form-control" id="pin" name="pin" required>
+              </div>
+              <div class="form-group">
+                <label for="name">Nombre:</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+              </div>
+              <div class="form-group">
+                <label for="last-name">Apellidos:</label>
+                <input type="text" class="form-control" id="last-name" name="last-name" required>
+              </div>
+              <div class="form-group">
+                <label for="country">País:</label>
+                <input type="text" class="form-control" id="country" name="country">
+              </div>
+              <div class="form-group">
+                <label for="date-of-birth">Fecha de Nacimiento:</label>
+                <input type="date" class="form-control" id="date-of-birth" name="date-of-birth" required>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block" onclick="registerUser()">Registrarse</button>
+            </form>
+            <div class="text-center mt-3">
+              <p>¿Ya tienes una cuenta? <a href="index.html">Inicia sesión</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function registerUser() {
+      const ajaxRequest = new XMLHttpRequest();
+      ajaxRequest.addEventListener("load", () => {
+        // Aquí podrías realizar acciones adicionales después de registrar al usuario
+        console.log("Usuario registrado exitosamente");
+      });
+      ajaxRequest.addEventListener("error", (error) => {
+        console.error('Error en la solicitud:', error);
+        // Aquí podrías manejar el error mostrando un mensaje al usuario
+      });
+      ajaxRequest.open("POST", "http://localhost:3001/api/register");
+      ajaxRequest.setRequestHeader("Content-Type", "application/json");
+
+      const data = {
+        'email': document.getElementById('email').value,
+        'password': document.getElementById('password').value,
+        'pin': document.getElementById('pin').value,
+        'name': document.getElementById('name').value,
+        'lastName': document.getElementById('last-name').value,
+        'country': document.getElementById('country').value,
+        'dateOfBirth': document.getElementById('date-of-birth').value
+      };
+      ajaxRequest.send(JSON.stringify(data));
+    }
+  </script>
+</body>
+</html>

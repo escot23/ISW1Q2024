@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión</title>
+    <!-- Agrega el enlace al archivo CSS de Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h1 class="card-title text-center">Iniciar sesión</h1>
+                        <form id="login-form">
+                            <div class="form-group">
+                                <label for="email">Correo electrónico:</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Contraseña:</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Iniciar sesión</button>
+                            <a href="file:///C:/Users/g/OneDrive/Documentos/ISW1Q2024/PrimerProyecto/client/register.html" class="btn btn-secondary btn-block">Registrarse</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agrega el enlace al archivo JavaScript de Bootstrap -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        const loginForm = document.getElementById('login-form');
+
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(loginForm);
+            const email = formData.get('email');
+            const password = formData.get('password');
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (response.ok) {
+                    const { token } = await response.json();
+                    // Guarda el token en el almacenamiento local o en las cookies
+                    console.log('Token de autenticación:', token);
+                    // Redirige al usuario a la página de inicio
+                    window.location.href = '/inicio';
+                } else {
+                    const { message } = await response.json();
+                    alert(message);
+                }
+            } catch (error) {
+                console.error('Error al iniciar sesión:', error);
+                alert('Error al iniciar sesión. Por favor, inténtalo de nuevo.');
+            }
+        });
+    </script>
+</body>
+</html>
